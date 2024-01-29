@@ -4,6 +4,8 @@ import java.util.concurrent.CopyOnWriteArrayList
 
 import groovy.time.*
 
+import groovy.transform.Synchronized
+
 /**
 * The TimeKeeper is a class that intercepts and overrides the default Date constructor.
 * This allows us to control the current time in tests, without having to build anything special into the app script itself.
@@ -14,6 +16,8 @@ class TimeKeeper {
     private Date internalDate = null
 
     private final CopyOnWriteArrayList<TimeChangedListener> timeChangedListeners
+
+    private final timekeeperLock = new Object()
 
     TimeKeeper() {
         internalDate = new Date()
@@ -78,14 +82,17 @@ class TimeKeeper {
         fireTimeChangedEvent(oldDate, internalDate)
     }
 
+    @Synchronized("timekeeperLock")
     def addListener(TimeChangedListener listener) {
         timeChangedListeners.add(listener)
     }
 
+    @Synchronized("timekeeperLock")
     def removeListener(TimeChangedListener listener) {
         timeChangedListeners.remove(listener)
     }
 
+    @Synchronized("timekeeperLock")
     def fireTimeChangedEvent(Date oldTime, Date newTime) {
         TimeChangedEvent event = new TimeChangedEvent(this, oldTime, newTime)
         timeChangedListeners.each { listener ->
