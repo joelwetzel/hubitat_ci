@@ -10,15 +10,23 @@ import me.biocomp.hubitat_ci.api.common_api.DeviceWrapper
 * are typically used in app scripts, so this class is a slimmed down version.
 */
 class DeviceEventArgs {
-    Object deviceId
     DeviceWrapper device
     String name
+    String type
     Object value
 
-    DeviceEventArgs(Object deviceId, DeviceWrapper device, String name, Object value) {
-        this.deviceId = deviceId
+    DeviceEventArgs(DeviceWrapper device, String name, String type, Object value) {
         this.device = device
         this.name = name
+        this.type = type
         this.value = value
+    }
+
+    Long getDeviceId() {
+        return device.getIdAsLong()
+    }
+
+    String getDisplayName() {
+        return device.getDisplayName()
     }
 }

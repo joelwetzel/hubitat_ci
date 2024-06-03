@@ -19,7 +19,7 @@ final class Utility
         return result
     }
 
-    
+
 
     /**
      * Return today's date object for given time.
@@ -28,7 +28,10 @@ final class Utility
      * @note most likely some date calculations are incorrect in some cases, but this is meant mostly for testing.
      */
     static Date timeToday(String timeString, TimeZone timeZone = null) {
-        assert timeZone != null
+        if (timeZone == null) {
+            timeZone = TimeZone.getDefault()
+        }
+
         def time = Utility.parseTimeString(timeString)
         def dateTime = ZonedDateTime.now(timeZone.toZoneId())
         def justDate = ZonedDateTime.of(dateTime.year, dateTime.monthValue, dateTime.dayOfMonth, 0, 0, 0, 0,
@@ -79,4 +82,3 @@ final class Utility
         return [hours: parsedIsoDate.hour, minutes: parsedIsoDate.minute, seconds: parsedIsoDate.second]
     }
 }
-

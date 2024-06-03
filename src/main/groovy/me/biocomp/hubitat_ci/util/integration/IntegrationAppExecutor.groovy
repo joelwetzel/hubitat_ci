@@ -6,6 +6,7 @@ import me.biocomp.hubitat_ci.api.common_api.BaseScheduler
 import me.biocomp.hubitat_ci.app.HubitatAppScript
 import me.biocomp.hubitat_ci.util.integration.DeviceEventArgs
 import me.biocomp.hubitat_ci.util.integration.PassthroughScheduler
+import me.biocomp.hubitat_ci.util.Utility
 
 /**
 * An implementation of portions of AppExecutor that are useful for integration tests.
@@ -37,6 +38,17 @@ abstract class IntegrationAppExecutor implements AppExecutor, PassthroughSchedul
         // Hubitat provides the toDateTime(String) method to convert back to a Date object.
         return Date.parse("yyyy-MM-dd'T'HH:mm:ssZ", dateTimeString)
     }
+
+    @Override
+    Date timeToday(String a) {
+        return Utility.timeToday(a)
+    }
+
+    @Override
+    Date timeToday(String a, TimeZone b) {
+        return Utility.timeToday(a, b)
+    }
+
 
     /**************************************************************
      * END SECTION: Time methods from BaseExecutor trait
@@ -83,7 +95,7 @@ abstract class IntegrationAppExecutor implements AppExecutor, PassthroughSchedul
             def matchOfNameAndValue = subInfo.attributeNameOrNameAndValueOrEventName == "${properties.name}.${properties.value}"
 
             if (matchOfAttributeName || matchOfNameAndValue) {
-                def generatedEvent = new DeviceEventArgs(device.getIdAsLong(), device, properties.name, properties.value)
+                def generatedEvent = new DeviceEventArgs(device, properties.name, properties.type, properties.value)
                 script."$subInfo.handler"(generatedEvent)
             }
         }

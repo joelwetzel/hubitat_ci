@@ -29,12 +29,12 @@ class SwitchFixtureFactory {
             switchMetaClass.on = {
                 attributeValues.switch = "on"
                 attributeValues.doubleTapped = null
-                appExecutor.sendEvent(switchDevice, [name: "switch.on", value: "on"])
+                appExecutor.sendEvent(switchDevice, [name: "switch.on", value: "on", type: "physical"])
             }
             switchMetaClass.off = {
                 attributeValues.switch = "off"
                 attributeValues.doubleTapped = null
-                appExecutor.sendEvent(switchDevice, [name: "switch.off", value: "off"])
+                appExecutor.sendEvent(switchDevice, [name: "switch.off", value: "off", type: "physical"])
             }
             switchMetaClass.doubleTap = { buttonNumber ->
                 attributeValues.doubleTapped = buttonNumber

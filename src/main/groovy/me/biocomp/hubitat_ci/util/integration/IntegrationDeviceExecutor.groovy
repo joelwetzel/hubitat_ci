@@ -54,8 +54,7 @@ abstract class IntegrationDeviceExecutor implements DeviceExecutor, PassthroughS
         // at the same time.  However, that would require allowing AppSandbox/Executor/Wrapper to work
         // together with DeviceSandbox/Executor/Wrapper, and that's not supported yet. So this is
         // commented out for now.
-        // def deviceId = 0    // device.getIdAsLong()
-        // def generatedEvent = new DeviceEventArgs(deviceId, device, properties.name, properties.value)
+        // def generatedEvent = new DeviceEventArgs(device, properties.name, properties.value)
         // throw new Exception("Need to send it somewhere.")
 
         device.sendEvent(properties)
