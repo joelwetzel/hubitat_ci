@@ -23,7 +23,7 @@ class SwitchFixtureFactoryTests extends Specification {
         switchFixture.on()
 
         then:
-        1*appExecutor.sendEvent(switchFixture, [name: "switch.on", value: "on"])
+        1*appExecutor.sendEvent(switchFixture, [name: "switch.on", value: "on", type: 'physical'])
         switchFixture.currentValue('switch') == "on"
         switchFixture.currentValue('doubleTapped') == null
     }
@@ -37,7 +37,7 @@ class SwitchFixtureFactoryTests extends Specification {
         switchFixture.off()
 
         then:
-        1*appExecutor.sendEvent(switchFixture, [name: "switch.off", value: "off"])
+        1*appExecutor.sendEvent(switchFixture, [name: "switch.off", value: "off", type: 'physical'])
         switchFixture.currentValue('switch') == "off"
         switchFixture.currentValue('doubleTapped') == null
     }

@@ -5,6 +5,7 @@ import me.biocomp.hubitat_ci.api.common_api.BaseScheduler
 import me.biocomp.hubitat_ci.device.HubitatDeviceScript
 import me.biocomp.hubitat_ci.util.integration.DeviceEventArgs
 import me.biocomp.hubitat_ci.util.integration.PassthroughScheduler
+import me.biocomp.hubitat_ci.util.Utility
 
 /**
 * An implementation of portions of DeviceExecutor that are useful for integration tests.
@@ -35,6 +36,18 @@ abstract class IntegrationDeviceExecutor implements DeviceExecutor, PassthroughS
         // format: 2020-11-02T14:32:17+0000
         // Hubitat provides the toDateTime(String) method to convert back to a Date object.
         return Date.parse("yyyy-MM-dd'T'HH:mm:ssZ", dateTimeString)
+    }
+
+    @Override
+    Date timeToday(String timeString, TimeZone timeZone)
+    {
+        return Utility.timeToday(timeString, timeZone)
+    }
+
+    @Override
+    Date timeToday(String timeString)
+    {
+        return Utility.timeToday(timeString)
     }
 
     /**************************************************************

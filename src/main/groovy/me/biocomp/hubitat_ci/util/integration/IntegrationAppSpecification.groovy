@@ -23,13 +23,13 @@ import spock.lang.Specification
  * An example of use can be found in DimmerMinimumsIntegrationTest.groovy.
  */
 abstract class IntegrationAppSpecification extends Specification {
+    protected log = Mock(Log)
+
     private HubitatAppSandbox sandbox
     protected HubitatAppScript appScript
-    private scheduler = new IntegrationScheduler()
+    protected scheduler = new IntegrationScheduler(log)
 
     protected installedApp = Mock(InstalledAppWrapper)
-
-    protected log = Mock(Log)
 
     protected appState = [:]
     protected appAtomicState = [:]

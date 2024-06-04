@@ -1,5 +1,6 @@
 package me.biocomp.hubitat_ci.util.integration
 
+import me.biocomp.hubitat_ci.api.common_api.Log
 import me.biocomp.hubitat_ci.api.common_api.BaseScheduler
 import me.biocomp.hubitat_ci.util.integration.TimeKeeper
 import me.biocomp.hubitat_ci.util.integration.TimeChangedEvent
@@ -20,7 +21,10 @@ class IntegrationScheduler implements BaseScheduler, TimeChangedListener {
 
     private final integrationSchedulerLock = new Object()
 
-    IntegrationScheduler() {
+    private Log _log
+
+    IntegrationScheduler(Log log = null) {
+        _log = log
     }
 
     def setHandlingObject(Object handlingObject) {
@@ -34,7 +38,10 @@ class IntegrationScheduler implements BaseScheduler, TimeChangedListener {
 
     @Synchronized("integrationSchedulerLock")
     void timeChangedEventReceived(TimeChangedEvent event) {
+        _log?.debug("IntegrationScheduler received timeChangedEvent: ${event.oldTime} -> ${event.newTime}")
+
         if (handlingObject == null) {
+            _log?.debug("IntegrationScheduler has no handling object set.  Ignoring timeChangedEvent.")
             return
         }
 
@@ -58,7 +65,7 @@ class IntegrationScheduler implements BaseScheduler, TimeChangedListener {
         if (scheduleRequest.cronExpression == null && scheduleRequest.nextFireAt != null) {
             // There's a special case where there's no cronString, but there is a nextFireAt date.
             // This is because if something needs to be scheduled to the second/millisecond, CRON can't do that.
-            if (scheduleRequest.nextFireAt.after(event.oldTime) && scheduleRequest.nextFireAt.before(event.newTime)) {
+            if (scheduleRequest.nextFireAt.after(event.oldTime) && (scheduleRequest.nextFireAt.before(event.newTime) || scheduleRequest.nextFireAt.equals(event.newTime) )) {
                 // fire it
                 fireOffScheduledEvent(scheduleRequest)
                 shouldRemoveJob = scheduleRequest.deleteAfterSingleRun
@@ -77,6 +84,8 @@ class IntegrationScheduler implements BaseScheduler, TimeChangedListener {
             while (evalStartTime < evalEndTime) {
                 def nextFireAt = exp.getNextValidTimeAfter(evalStartTime)
 
+                _log?.debug("Evaluating scheduleRequest: ${scheduleRequest.handlerMethod} ${scheduleRequest.cronExpression} - nextFireAt: ${nextFireAt}")
+
                 if (nextFireAt == null || nextFireAt.after(evalEndTime)) {
                     break
                 }
@@ -94,6 +103,8 @@ class IntegrationScheduler implements BaseScheduler, TimeChangedListener {
     }
 
     private void fireOffScheduledEvent(ScheduleRequest scheduleRequest) {
+        _log?.debug("Firing off scheduled event for ${scheduleRequest.handlerMethod}")
+
         if (scheduleRequest.options?.data != null) {
             handlingObject."${scheduleRequest.handlerMethod}"(scheduleRequest.options.data)
         } else {

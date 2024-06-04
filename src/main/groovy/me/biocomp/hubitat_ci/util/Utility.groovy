@@ -3,6 +3,8 @@ package me.biocomp.hubitat_ci.util
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
+import me.biocomp.hubitat_ci.util.integration.TimeKeeper
+import java.util.Calendar
 
 
 final class Utility
@@ -33,16 +35,14 @@ final class Utility
         }
 
         def time = Utility.parseTimeString(timeString)
-        def dateTime = ZonedDateTime.now(timeZone.toZoneId())
-        def justDate = ZonedDateTime.of(dateTime.year, dateTime.monthValue, dateTime.dayOfMonth, 0, 0, 0, 0,
-                timeZone.toZoneId())
-        def updatedDate = justDate
-                .plusHours(time.hours)
-                .plusMinutes(time.minutes)
-                .plusSeconds(time.seconds);
+        def dateTime = TimeKeeper.now()
 
-        return new Date(updatedDate.year, updatedDate.monthValue, updatedDate.dayOfMonth, updatedDate.hour,
-                updatedDate.minute, updatedDate.second);
+        Calendar now = Calendar.getInstance();
+        now.setTime(dateTime);
+        now.set(Calendar.HOUR_OF_DAY, time.hours);
+        now.set(Calendar.MINUTE, time.minutes);
+        now.set(Calendar.SECOND, time.seconds);
+        return now.getTime();
     }
 
     static boolean timeOfDayIsBetween(Date start, Date stop, Date value, TimeZone timeZone = null) {

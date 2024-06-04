@@ -23,7 +23,7 @@ class DimmerFixtureFactoryTests extends Specification {
         dimmerFixture.on()
 
         then:
-        1*appExecutor.sendEvent(dimmerFixture, [name: "switch.on", value: "on"])
+        1*appExecutor.sendEvent(dimmerFixture, [name: "switch.on", value: "on", type: 'physical'])
         dimmerFixture.currentValue('switch') == "on"
         dimmerFixture.currentValue('doubleTapped') == null
     }
@@ -37,7 +37,7 @@ class DimmerFixtureFactoryTests extends Specification {
         dimmerFixture.off()
 
         then:
-        1*appExecutor.sendEvent(dimmerFixture, [name: "switch.off", value: "off"])
+        1*appExecutor.sendEvent(dimmerFixture, [name: "switch.off", value: "off", type: 'physical'])
         dimmerFixture.currentValue('switch') == "off"
         dimmerFixture.currentValue('doubleTapped') == null
     }
@@ -51,7 +51,7 @@ class DimmerFixtureFactoryTests extends Specification {
         dimmerFixture.setLevel(100)
 
         then:
-        1*appExecutor.sendEvent(dimmerFixture, [name: "level", value: 100])
+        1*appExecutor.sendEvent(dimmerFixture, [name: "level", value: 100, type: 'physical'])
         dimmerFixture.currentValue('level') == 100
         dimmerFixture.currentValue('doubleTapped') == null
     }
@@ -65,8 +65,8 @@ class DimmerFixtureFactoryTests extends Specification {
         dimmerFixture.setLevel(100)
 
         then:
-        1*appExecutor.sendEvent(dimmerFixture, [name: "level", value: 100])
-        1*appExecutor.sendEvent(dimmerFixture, [name: "switch.on", value: "on"])
+        1*appExecutor.sendEvent(dimmerFixture, [name: "level", value: 100, type: 'physical'])
+        1*appExecutor.sendEvent(dimmerFixture, [name: "switch.on", value: "on", type: 'physical'])
         dimmerFixture.currentValue('switch') == "on"
         dimmerFixture.currentValue('level') == 100
         dimmerFixture.currentValue('doubleTapped') == null

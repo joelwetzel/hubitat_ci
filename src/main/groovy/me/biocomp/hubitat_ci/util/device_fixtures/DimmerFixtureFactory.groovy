@@ -42,7 +42,7 @@ class DimmerFixtureFactory {
                 attributeValues.doubleTapped = null
                 appExecutor.sendEvent(dimmerDevice, [name: "switch.off", value: "off", type: "physical"])
             }
-            dimmerMetaClass.setLevel = { int level ->
+            dimmerMetaClass.setLevel = { int level, int seconds = 0 ->
                 // Most real dimmers will do this in their firmware:
                 if (attributeValues.switch == "off" && level > 0) {
                     attributeValues.switch = "on"

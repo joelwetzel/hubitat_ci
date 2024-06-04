@@ -35,6 +35,7 @@ def updated() {
 
 def initialize() {
     subscribe(switches, 'switch.on', switchOnHandler)
+    subscribe(switches, 'switch.off', switchOffHandler)
     state.callbackCount = 0
 }
 
@@ -52,4 +53,15 @@ def runInMillisHandler(evt) {
     if (state.callbackCount < 3) {
         runInMillis(1000, 'runInMillisHandler')
     }
+}
+
+/**
+* I'm using a switch.off event to trigger the scheduling of a runEvery1Minute callback.
+*/
+def switchOffHandler(evt) {
+    runEvery1Minute(tickTock)
+}
+
+def tickTock(evt) {
+    log.debug "tickTock() called"
 }

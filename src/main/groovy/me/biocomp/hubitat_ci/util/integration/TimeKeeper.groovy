@@ -35,6 +35,11 @@ class TimeKeeper {
     }
 
     @Synchronized("timekeeperLock")
+    static void reset() {
+        internalDate = new Date()
+    }
+
+    @Synchronized("timekeeperLock")
     static void advanceMillis(int millis) {
         def oldDate = internalDate
         internalDate = groovy.time.TimeCategory.plus(internalDate, new groovy.time.TimeDuration(0, 0, 0, 0, millis))

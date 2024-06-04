@@ -3,6 +3,7 @@ package me.biocomp.hubitat_ci.util
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
+import me.biocomp.hubitat_ci.util.integration.TimeKeeper
 
 class UtilityTest extends
         Specification
@@ -13,16 +14,37 @@ class UtilityTest extends
     @Shared
     def myTimeZone = new GregorianCalendar().getTimeZone()
 
+    def "timeToday can parse"() {
+        given:
+        TimeKeeper.reset()
+        def now = TimeKeeper.now()
+        def timeString = "2020-02-24T02:00:00.000-0600"
+
+        when:
+        def timeToday = Utility.timeToday(timeString)
+
+        then:
+        timeToday.hours == 2
+        timeToday.minutes == 0
+        timeToday.seconds == 0
+        timeToday.year == now.year
+        timeToday.month == now.month
+        timeToday.day == now.day
+    }
+
     @Unroll
     def "timeToday properly appends time (#timeString)"(String timeString, TimeZone tz, int expectedHr, int expectedMin,
                                           int expectedSec) {
+        given:
+            TimeKeeper.reset()
+
         expect:
             Date today = Utility.timeToday(timeString, tz)
             today.hours == expectedHr
             today.minutes == expectedMin
             today.seconds == expectedSec
 
-            today.year > 2017
+            today.year + 1900 > 2017            // Years in the java.util.Date object are counted starting at year 1900
             today.month >= 0
             today.month < 12
             today.day >= 0 // Shouldn't really be == 0, but somehow it happens in VSTS.
