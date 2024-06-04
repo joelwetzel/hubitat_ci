@@ -31,7 +31,7 @@ class DimmerFixtureFactory {
             dimmerMetaClass.on = {
                 attributeValues.switch = "on"
                 attributeValues.doubleTapped = null
-                appExecutor.sendEvent(dimmerDevice, [name: "switch.on", value: "on"])
+                appExecutor.sendEvent(dimmerDevice, [name: "switch.on", value: "on", type: "physical"])
 
                 if (attributeValues.level == 0) {
                     setLevel(100)
@@ -40,19 +40,19 @@ class DimmerFixtureFactory {
             dimmerMetaClass.off = {
                 attributeValues.switch = "off"
                 attributeValues.doubleTapped = null
-                appExecutor.sendEvent(dimmerDevice, [name: "switch.off", value: "off"])
+                appExecutor.sendEvent(dimmerDevice, [name: "switch.off", value: "off", type: "physical"])
             }
             dimmerMetaClass.setLevel = { int level ->
                 // Most real dimmers will do this in their firmware:
                 if (attributeValues.switch == "off" && level > 0) {
                     attributeValues.switch = "on"
-                    appExecutor.sendEvent(dimmerDevice, [name: "switch.on", value: "on"])
+                    appExecutor.sendEvent(dimmerDevice, [name: "switch.on", value: "on", type: "physical"])
                 }
 
                 attributeValues.level = level
                 attributeValues.doubleTapped = null
 
-                appExecutor.sendEvent(dimmerDevice, [name: "level", value: level])
+                appExecutor.sendEvent(dimmerDevice, [name: "level", value: level, type: "physical"])
             }
             dimmerMetaClass.doubleTap = { buttonNumber ->
                 attributeValues.doubleTapped = buttonNumber
