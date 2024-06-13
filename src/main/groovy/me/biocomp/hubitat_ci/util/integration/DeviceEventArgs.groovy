@@ -13,13 +13,13 @@ class DeviceEventArgs {
     DeviceWrapper device
     String name
     String type
-    Object value
+    String value
 
     DeviceEventArgs(DeviceWrapper device, String name, String type, Object value) {
         this.device = device
         this.name = name
         this.type = type
-        this.value = value
+        this.value = value.toString()
     }
 
     Long getDeviceId() {

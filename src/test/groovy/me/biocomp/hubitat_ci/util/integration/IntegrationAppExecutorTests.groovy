@@ -41,7 +41,7 @@ class IntegrationAppExecutorTests extends Specification {
             assert event.deviceId == 1
             assert event.device == device
             assert event.name == 'level'
-            assert event.value == 50
+            assert event.value == '50'
         }
     }
 
@@ -102,7 +102,7 @@ class IntegrationAppExecutorTests extends Specification {
             assert event.deviceId == 2
             assert event.device == device2
             assert event.name == 'level'
-            assert event.value == 55
+            assert event.value == '55'
         }
     }
 
@@ -124,7 +124,7 @@ class IntegrationAppExecutorTests extends Specification {
             assert event.deviceId == 2
             assert event.device == device2
             assert event.name == 'level'
-            assert event.value == 55
+            assert event.value == '55'
         }
     }
 
