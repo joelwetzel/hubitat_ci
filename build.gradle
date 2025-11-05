@@ -17,8 +17,6 @@ task groovydocJar(type: Jar, dependsOn: groovydoc) {
     from groovydoc.destinationDir
 }
 
-if (System.getenv("AZURE_ARTIFACTS_ENV_ACCESS_TOKEN") || project.hasProperty('azureArtifactsGradleAccessToken'))
-{
 publishing {
     publications {
         maven(MavenPublication){
@@ -33,7 +31,8 @@ publishing {
         }
     }
 
-        repositories{
+    if (System.getenv("AZURE_ARTIFACTS_ENV_ACCESS_TOKEN") || project.hasProperty('azureArtifactsGradleAccessToken')) {
+	repositories{
             maven {
                 url System.getenv("MAVEN_ENDPOINT") ?: "https://biocomp.pkgs.visualstudio.com/HubitatCiRelease/_packaging/hubitat_ci_feed/maven/v1"
                 credentials {
