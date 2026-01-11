@@ -21,6 +21,17 @@ These validations can catch errors like these:
 - Validate command and capabilities method signatures and names
 - And many more...
 
+### Integration testing framework
+The library includes a full integration testing framework that allows you to write tests for your apps and device drivers as if you were an end user interacting with them. The integration test framework provides:
+
+- **Time control**: Advance time in your tests to trigger scheduled events and timers without waiting
+- **Device fixtures**: Pre-built mock devices (switches, dimmers, locks, etc.) that behave realistically
+- **Event simulation**: Trigger device events and verify your app responds correctly
+- **Scheduler simulation**: Test cron expressions, runIn, runOnce, and other scheduled callbacks
+- **Base specification classes**: `IntegrationAppSpecification` and `IntegrationDeviceSpecification` simplify test setup
+
+Integration tests let you focus on behavior rather than implementation details. See the [Integration Testing Guide](docs/integration_testing.md) for examples.
+
 ### Debug your script
 With proper IDE (I'm using [IntellijIDEA](https://www.jetbrains.com/idea/)), you can step through your tests **and your script**, view variables and have rich debugging experience in general.
 
@@ -37,4 +48,5 @@ Here's a build script file: [azure-pipelines.yml](azure-pipelines.yml).
 ## Documentation
 - [Getting started](docs/getting_started.md)
 - [How to test](docs/how_to_test.md): library usage and common mocking techniques
+- [Integration testing guide](docs/integration_testing.md): write end-to-end tests for your apps and device drivers
 - [Changelog](docs/changelog.md)
