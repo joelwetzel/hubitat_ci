@@ -1,6 +1,8 @@
 # Hubitat CI
 
-[![Build Status](https://biocomp.visualstudio.com/HubitatCiRelease/_apis/build/status/hubitat_ci%20build?branchName=master)](https://biocomp.visualstudio.com/HubitatCiRelease/_build/latest?definitionId=13&branchName=master)
+[![CI/CD Pipeline](https://github.com/joelwetzel/hubitat_ci/actions/workflows/ci.yml/badge.svg)](https://github.com/joelwetzel/hubitat_ci/actions/workflows/ci.yml)
+[![GitHub package.json version](https://img.shields.io/github/package-json/v/joelwetzel/hubitat_ci?filename=build.gradle&label=version)](https://github.com/joelwetzel/hubitat_ci/packages/2804977)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 This library allows testing of Hubitat scripts locally on your machine (and via **C**ontinuous **I**ntegration, thus Hubitat CI).
 
