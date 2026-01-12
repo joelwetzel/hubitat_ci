@@ -38,10 +38,10 @@ With proper IDE (I'm using [IntellijIDEA](https://www.jetbrains.com/idea/)), you
 ![Image of debug session](docs/debugging.png)
 
 ### Run your tests in the cloud after (or before) every push
-Just something obvious, really. 
+Just something obvious, really.
 If you can run it on your machine, you can also run it in the cloud.
 
-This library, and [hubitat_ci_example](https://github.com/biocomp/hubitat_ci_example), for example, 
+This library, and [hubitat_ci_example](https://github.com/biocomp/hubitat_ci_example), for example,
 have automatic builds set up in Azure Devops (former VSTS).
 Here's a build script file: [azure-pipelines.yml](azure-pipelines.yml).
 
@@ -49,4 +49,5 @@ Here's a build script file: [azure-pipelines.yml](azure-pipelines.yml).
 - [Getting started](docs/getting_started.md)
 - [How to test](docs/how_to_test.md): library usage and common mocking techniques
 - [Integration testing guide](docs/integration_testing.md): write end-to-end tests for your apps and device drivers
+- [Publishing guide](docs/publishing.md): how to publish updated versions of Hubitat_CI to Maven
 - [Changelog](docs/changelog.md)
