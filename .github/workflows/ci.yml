@@ -78,22 +78,35 @@ jobs:
 
     - name: Check if version exists in registry
       id: check_version
-      continue-on-error: true
       run: |
-        REPO="${{ github.repository }}"
+        OWNER=$(echo "${{ github.repository }}" | cut -d'/' -f1)
+        REPO_NAME=$(echo "${{ github.repository }}" | cut -d'/' -f2)
         VERSION="${{ steps.get_version.outputs.version }}"
 
-        # Try to download the existing version
-        RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
-          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-          "https://maven.pkg.github.com/${REPO}/me/biocomp/hubitat_ci/hubitat_ci/${VERSION}/hubitat_ci-${VERSION}.pom")
+        echo "Checking for version $VERSION in package me.biocomp.hubitat_ci:hubitat_ci"
 
-        if [ "$RESPONSE" = "200" ]; then
-          echo "exists=true" >> $GITHUB_OUTPUT
-          echo "Version $VERSION already exists in registry"
+        # Use GitHub API to check for package versions
+        RESPONSE=$(curl -s -w "\n%{http_code}" \
+          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          -H "Accept: application/vnd.github.v3+json" \
+          "https://api.github.com/users/$OWNER/packages/maven/me.biocomp.hubitat_ci.hubitat_ci/versions")
+
+        HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+        BODY=$(echo "$RESPONSE" | sed '$d')
+
+        if [ "$HTTP_CODE" = "200" ]; then
+          # Check if our version exists in the list
+          if echo "$BODY" | grep -q "\"name\":\"$VERSION\""; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "✅ Version $VERSION already exists in registry"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "🆕 Version $VERSION does not exist, will publish"
+          fi
         else
+          # Package might not exist yet, safe to publish
           echo "exists=false" >> $GITHUB_OUTPUT
-          echo "Version $VERSION does not exist, will publish"
+          echo "📦 Package not found (HTTP $HTTP_CODE), will publish"
         fi
 
     - name: Publish to GitHub Packages
