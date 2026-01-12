@@ -1,5 +1,16 @@
 # Changelog
 
+## Version 0.23
+- **NEW: Full Integration Testing Framework** - Added comprehensive integration testing support
+  - `IntegrationAppSpecification` and `IntegrationDeviceSpecification` base classes for easy test setup
+  - `IntegrationScheduler` for testing scheduled events and cron expressions
+  - `TimeKeeper` class for controlling time in tests (advance seconds, minutes, hours, days)
+  - `IntegrationAppExecutor` and `IntegrationDeviceExecutor` for realistic app/device execution
+  - Device fixture factories: Switch, Dimmer, Lock, Fan, WindowShade, PresenceSensor, LightSensor
+  - Support for testing event subscriptions and device interactions
+  - Comprehensive [integration testing documentation](integration_testing.md)
+- **BUG FIX**: Fixed variable name error in `IntegrationScheduler.runOnce(String, String, Map)` method (line 310)
+
 ## Version 0.9
 - Added trace() method to Log interface
 

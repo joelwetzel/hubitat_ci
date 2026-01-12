@@ -318,7 +318,7 @@ class IntegrationScheduler implements BaseScheduler, TimeChangedListener {
         runOnce(dateTime, handlerMethod.name, options)
     }
     @Override void runOnce(String dateTime, String handlerMethod, Map options) {
-        parsedDate = Date.parse(ISO_8601_FORMAT, cronExpressionOrIsoDate)
+        def parsedDate = Date.parse(ISO_8601_FORMAT, dateTime)
         runOnce(parsedDate, handlerMethod, options)
     }
 
