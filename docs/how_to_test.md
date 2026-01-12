@@ -7,7 +7,44 @@ It doesn't matter what you use for your testing though.
 ## Setting up the test
 [Getting started instructions](getting_started.md)
 
-## Testing an app
+## Running Tests for Hubitat_CI
+To run all unit tests in the hubitat_ci project:
+```bash
+./gradlew test
+```
+
+This will compile the project and execute all test classes. Tests are written using the [Spock framework](http://spockframework.org/).
+
+After running the tests, you can view the test reports at:
+```
+build/reports/tests/test/index.html
+```
+
+To run all verification tasks (including tests):
+```bash
+./gradlew check
+```
+
+### Running Tests in VS Code
+
+The tests in this project use the Spock framework with Groovy, which is not natively supported by VS Code's Java Test Runner extension. To run tests in VS Code, you have several options:
+
+1. **Using the integrated terminal** (recommended):
+   - Open the terminal (`` Ctrl+` `` or `` Cmd+` ``)
+   - Run `./gradlew test` or `./gradlew test --continuous` for watch mode
+
+2. **Using VS Code Tasks**:
+   - Press `Cmd+Shift+P` (Mac) or `Ctrl+Shift+P` (Windows/Linux)
+   - Type "Tasks: Run Task"
+   - Select "gradle: test"
+
+3. **Using IntelliJ IDEA**:
+   - IntelliJ IDEA has better support for Spock/Groovy tests
+   - You can run individual test classes or methods directly from the editor
+
+**Note**: VS Code's Testing tab does not currently show Spock/Groovy tests because the Java Test Runner extension only supports JUnit and TestNG frameworks.
+
+## Using Hubitat_CI to test a Hubitat app
 Test below parses [appscript.groovy](https://github.com/biocomp/hubitat_ci_example/blob/master/minimal/appscript.groovy) file, creates a script object out of it and performs basic validations.
 
 This happens when `sandbox.run()` method is executed.
@@ -32,8 +69,8 @@ class Test extends Specification
 }
 ```
 
-## Testing a device driver
-It's the same as testing an app, but you need to use `HubitatDeviceSandbox`. 
+## Testing a Hubitat device driver
+It's the same as testing an app, but you need to use `HubitatDeviceSandbox`.
 
 See [HowToTestDevice.groovy](https://github.com/biocomp/hubitat_ci_example/blob/master/how_to_test/src/HowToTestDevice.groovy) and [device_script.groovy](https://github.com/biocomp/hubitat_ci_example/blob/master/how_to_test/device_script.groovy) for full source.
 ```groovy
@@ -55,9 +92,9 @@ class HowToTestDevice extends Specification
 }
 ```
 ## Mocking calls to Hubitat APIs
-`run()` method of `HubitatAppSandbox` and `HubitatDeviceSandbox` takes map of extra parameters. 
+`run()` method of `HubitatAppSandbox` and `HubitatDeviceSandbox` takes map of extra parameters.
 
-One of them is `api`. It should be implementation of `me.biocomp.hubitat_ci.api.app_api.AppExecutor` or `me.biocomp.hubitat_ci.api.device_api.DeviceExecutor` interfaces for app or device respectively. They contain all the supported Hubitat methods, and can be mocked via Spock standard methods. 
+One of them is `api`. It should be implementation of `me.biocomp.hubitat_ci.api.app_api.AppExecutor` or `me.biocomp.hubitat_ci.api.device_api.DeviceExecutor` interfaces for app or device respectively. They contain all the supported Hubitat methods, and can be mocked via Spock standard methods.
 
 Produced script object will redirect calls to the unknown apis to this `api` object.
 
@@ -144,7 +181,7 @@ def "Mocking app/device state"()
 {
     setup:
         // Defining state map
-        def state = [val1:42, val2:"Some value2"] 
+        def state = [val1:42, val2:"Some value2"]
 
         // This is example for device
         DeviceExecutor executorApi = Mock{
@@ -263,7 +300,7 @@ def "You can validate data generated during app script's setup"()
 ```
 
 ## You can validate data generated during app script's setup
-When device is set up, its initialization is also verified. 
+When device is set up, its initialization is also verified.
 But it's too captured and can be queried in your test.
 
 Source code: [ValidatingInputsAndProperties.groovy](https://github.com/biocomp/hubitat_ci_example/blob/master/how_to_test/src/ValidatingInputsAndProperties.groovy), [more_complex_device.groovy](https://github.com/biocomp/hubitat_ci_example/blob/master/how_to_test/more_complex_app.groovy)
@@ -297,7 +334,7 @@ class HowToTestDeviceWithInlineScript extends
 {
     def "You can have script code inside the test"() {
         setup:
-            // Creating sandbox object, but instead of loading script from a file, 
+            // Creating sandbox object, but instead of loading script from a file,
             // contents are directly provided.
             HubitatDeviceSandbox sandbox = new HubitatDeviceSandbox("""
 metadata {
