@@ -80,7 +80,6 @@ jobs:
       id: check_version
       run: |
         OWNER=$(echo "${{ github.repository }}" | cut -d'/' -f1)
-        REPO_NAME=$(echo "${{ github.repository }}" | cut -d'/' -f2)
         VERSION="${{ steps.get_version.outputs.version }}"
 
         echo "Checking for version $VERSION in package me.biocomp.hubitat_ci:hubitat_ci"
@@ -94,10 +93,6 @@ jobs:
         HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
         BODY=$(echo "$RESPONSE" | sed '$d')
 
-        echo "API Response Code: $HTTP_CODE"
-        echo "API Response Body:"
-        echo "$BODY" | head -20
-        
         if [ "$HTTP_CODE" = "200" ]; then
           # Check if our version exists in the list
           if echo "$BODY" | grep -q "\"name\":\"$VERSION\""; then
@@ -106,6 +101,9 @@ jobs:
           else
             echo "exists=false" >> $GITHUB_OUTPUT
             echo "🆕 Version $VERSION does not exist, will publish"
-            echo "Available versions:"
-            echo "$BODY" | grep '"name"' || echo "None found"
-        echo "⚠️ Version ${{ steps.get_version.outputs.version }} already published. Please update version in build.gradle to publish."
+          fi
+        else
+          # Package might not exist yet, safe to publish
+          echo "exists=false" >> $GITHUB_OUTPUT
+          echo "📦 Package not found (HTTP $HTTP_CODE), will publish"
+        fi
