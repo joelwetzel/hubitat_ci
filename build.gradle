@@ -17,14 +17,12 @@ task groovydocJar(type: Jar, dependsOn: groovydoc) {
     from groovydoc.destinationDir
 }
 
-if (System.getenv("AZURE_ARTIFACTS_ENV_ACCESS_TOKEN") || project.hasProperty('azureArtifactsGradleAccessToken'))
-{
 publishing {
     publications {
-        maven(MavenPublication){
+        maven(MavenPublication) {
             groupId = 'me.biocomp.hubitat_ci'
-            artifactId = System.getenv("MAVEN_ARTIFACT_ID") ?: 'hubitat_ci'
-            version = 0.47
+            artifactId = 'hubitat_ci'
+            version = 0.48
 
             from components.java
 
@@ -33,13 +31,13 @@ publishing {
         }
     }
 
-        repositories{
-            maven {
-                url System.getenv("MAVEN_ENDPOINT") ?: "https://biocomp.pkgs.visualstudio.com/HubitatCiRelease/_packaging/hubitat_ci_feed/maven/v1"
-                credentials {
-                    username "AZURE_ARTIFACTS"
-                    password System.getenv("AZURE_ARTIFACTS_ENV_ACCESS_TOKEN") ?: "${azureArtifactsGradleAccessToken}"
-                }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/${System.getenv("GITHUB_REPOSITORY") ?: "biocomp/hubitat_ci"}")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
             }
         }
     }
