@@ -42,8 +42,8 @@ Just something obvious, really.
 If you can run it on your machine, you can also run it in the cloud.
 
 This library, and [hubitat_ci_example](https://github.com/biocomp/hubitat_ci_example), for example,
-have automatic builds set up in Azure Devops (former VSTS).
-Here's a build script file: [azure-pipelines.yml](azure-pipelines.yml).
+have automatic builds set up using GitHub Actions.
+Here's the workflow file: [.github/workflows/ci.yml](.github/workflows/ci.yml).
 
 ## Documentation
 - [Getting started](docs/getting_started.md)

@@ -56,11 +56,11 @@ Test reports: `build/reports/tests/test/index.html`
 # Generate docs
 ./gradlew groovydoc  # Output: build/docs/groovydoc/
 
-# Publish to Maven (requires Azure credentials)
+# Publish to GitHub Packages (requires GitHub token with write:packages scope)
 ./gradlew publish
 ```
 
-Azure Pipelines automatically builds on every master commit and PR ([azure-pipelines.yml](../azure-pipelines.yml)).
+GitHub Actions automatically builds and publishes on every master commit ([.github/workflows/ci.yml](../.github/workflows/ci.yml)).
 
 ## Project-Specific Conventions
 
