@@ -85,25 +85,29 @@ jobs:
         echo "Checking for version $VERSION in package me.biocomp.hubitat_ci:hubitat_ci"
 
         # Use GitHub API to check for package versions
-        RESPONSE=$(curl -s -w "\n%{http_code}" \
+        RESPONSE=$(curl -s \
           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
           -H "Accept: application/vnd.github.v3+json" \
           "https://api.github.com/users/$OWNER/packages/maven/me.biocomp.hubitat_ci.hubitat_ci/versions")
 
-        HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
-        BODY=$(echo "$RESPONSE" | sed '$d')
-
-        if [ "$HTTP_CODE" = "200" ]; then
-          # Check if our version exists in the list
-          if echo "$BODY" | grep -q "\"name\":\"$VERSION\""; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-            echo "✅ Version $VERSION already exists in registry"
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-            echo "🆕 Version $VERSION does not exist, will publish"
-          fi
+        # Check if our version exists using jq (more reliable than grep)
+        if echo "$RESPONSE" | jq -e ".[] | select(.name == \"$VERSION\")" > /dev/null 2>&1; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+          echo "✅ Version $VERSION already exists in registry - skipping publish"
         else
-          # Package might not exist yet, safe to publish
           echo "exists=false" >> $GITHUB_OUTPUT
-          echo "📦 Package not found (HTTP $HTTP_CODE), will publish"
+          echo "🆕 Version $VERSION does not exist - will publish"
         fi
+
+    - name: Publish to GitHub Packages
+      if: steps.check_version.outputs.exists != 'true'
+      run: ./gradlew publish
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_ACTOR: ${{ github.actor }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+
+    - name: Skip publishing
+      if: steps.check_version.outputs.exists == 'true'
+      run: |
+        echo "⚠️ Version ${{ steps.get_version.outputs.version }} already published. Please update version in build.gradle to publish."
