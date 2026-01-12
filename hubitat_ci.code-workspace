@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+  ],
+  "settings": {
+    "java.configuration.updateBuildConfiguration": "disabled",
+    "chat.tools.terminal.autoApprove": {
+      "/^\\./gradlew test$/": {
+        "approve": true,
+        "matchCommandLine": true
+      },
+      "/^\\./gradlew tasks --group=verification$/": {
+        "approve": true,
+        "matchCommandLine": true
+      }
+    }
+  }
+}
