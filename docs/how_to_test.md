@@ -1,4 +1,22 @@
-# How to test
+# How to Test - Validation and Unit Testing
+
+This guide covers **validation tests** and **unit testing** with Hubitat CI. These tests focus on:
+- Automatic validation of script structure and metadata
+- Mocking Hubitat APIs for testing individual methods
+- Testing internal script methods in isolation
+
+For **integration tests** that simulate real device behavior and events, see the [Integration Testing Guide](integration_testing.md).
+
+## Two Types of Testing: Quick Overview
+
+| Type | What It Tests | When to Use |
+|------|---------------|-------------|
+| **Validation Tests** | Script structure, metadata, API usage | Automatically on every test |
+| **Unit Tests** | Individual methods with mocks | Testing specific method logic |
+| **Integration Tests** | End-to-end behavior with device fixtures | Testing app/driver behavior (see [Integration Testing Guide](integration_testing.md)) |
+
+This guide covers validation and unit testing. Integration testing is covered separately.
+
 ## Spock framework
 I developed hubitat_ci using [Spock](http://spockframework.org/) framework, and I'm going to be showing examples with it too.
 
