@@ -90,7 +90,7 @@ class HubitatAppSandbox {
     private static AppValidator readValidator(Map options) {
         if (options.validationFlags)
         {
-            return new AppValidator(options.validationFlags as List<String>)
+            return new AppValidator(options.validationFlags as List<Flags>)
         }
         else if (options.validator)
         {

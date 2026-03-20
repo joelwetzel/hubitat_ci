@@ -11,6 +11,7 @@ import me.biocomp.hubitat_ci.validation.IInputSource
 import me.biocomp.hubitat_ci.validation.SettingsContainer
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
+import groovy.transform.TypeCheckingMode
 
 @TypeChecked
 class AppPreferencesReader implements
@@ -115,6 +116,7 @@ class AppPreferencesReader implements
      * @return
      */
     @Override
+    @TypeChecked(TypeCheckingMode.SKIP)
     def page(Map options) {
         if (validator.hasFlag(Flags.AllowTitleInPageCallingMethods)) {
             Page.dynamicPageInitialParamValidatorWithTitle.validate("page(${options}) - special case of reference to method",
@@ -127,14 +129,14 @@ class AppPreferencesReader implements
         }
 
         // Now need to run named closure that is adding dynamic pages
-        def methodWithNoArgs = parentScript.getMetaClass().pickMethod(options.name as String, [] as Class[])
-        if (methodWithNoArgs) {
-            return prefState.withCurrentDynamicMethod(options.name as String, { methodWithNoArgs.invoke(parentScript) })
-        } else {
-            def methodWithMapArg = parentScript.getMetaClass().pickMethod(options.name as String,
-                    [Map.class] as Class[])
-            if (methodWithMapArg) {
-                return prefState.withCurrentDynamicMethod(options.name as String, { methodWithNoArgs.invoke(parentScript, [:]) })
+        def method = parentScript.getMetaClass().pickMethod(options.name as String, [] as Class[])
+                ?: parentScript.getMetaClass().pickMethod(options.name as String, [Map.class] as Class[])
+        if (method) {
+            if (method.parameterTypes.length == 0) {
+                return prefState.withCurrentDynamicMethod(options.name as String, { method.invoke(parentScript) })
+            } else {
+                // Map-arg method (Groovy named-params convention): call with empty Map
+                return prefState.withCurrentDynamicMethod(options.name as String, { method.invoke(parentScript, [[:]] as Object[]) })
             }
         }
 

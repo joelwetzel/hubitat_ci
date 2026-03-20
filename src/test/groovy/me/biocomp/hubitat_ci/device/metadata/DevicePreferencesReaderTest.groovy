@@ -103,14 +103,14 @@ metadata{
 
         then:
             AssertionError e = thrown()
-            failureMessages.each { e.message.contains(it) }
+            failureMessages.each { assert e.message.contains(it) }
 
         where:
             inputDef       | failureMessages
-            "name: 'nam'"  | ["nam", "type", "missing"]
-            "type: 'bool'" | ["bool", "name", "missing"]
-            "title: 'tit'" | ["tit", "name", "type", "missing"]
-            "'nam', null"  | ["nam", "type", "missing"]
+            "name: 'nam'"  | ["nam", "type", "not set"]
+            "type: 'bool'" | ["bool", "name", "not set"]
+            "title: 'tit'" | ["tit", "name", "type", "not set"]
+            "'nam', null"  | ["nam", "type", "null"]
     }
 
     @Unroll

@@ -19,23 +19,23 @@ class AppDefinitionReaderTest extends
 
         then:
             AssertionError e = thrown()
-            expectedErrorParts.each { e.message.contains(it) }
+            expectedErrorParts.each { assert e.message.contains(it) }
 
             // Order here is important, these are sorted by name
             if (verifyAllParametersPrinted) {
-                e.message.contains("[author, description, iconUrl, iconX2Url, iconX3Url, name, namespace]")
+                assert e.message.contains("[author, category, description, iconUrl, iconX2Url, iconX3Url, name, namespace, oauth, parent, singleInstance]")
             }
 
         where:
             parameters                                                                                                    | expectedErrorParts              | verifyAllParametersPrinted
-            [/*name: "v",*/ namespace: "v", author: "v", description: "v", iconUrl: "v", iconX2Url: "v", iconX3Url: "v"]  | ["name", "not provided"]        | true
-            [name: "", namespace: "v", author: "v", description: "v", iconUrl: "v", iconX2Url: "v", iconX3Url: "v"]       | ["name", "empty"]               | false
-            [name: "v", /*namespace: "v", */ author: "v", description: "v", iconUrl: "v", iconX2Url: "v", iconX3Url: "v"] | ["namespace", "not provided"]   | true
-            [name: "v", namespace: "v", /*author: "v", */ description: "v", iconUrl: "v", iconX2Url: "v", iconX3Url: "v"] | ["author", "not provided"]      | true
-            [name: "v", namespace: "v", author: "v", /*description: "v",*/ iconUrl: "v", iconX2Url: "v", iconX3Url: "v"]  | ["description", "not provided"] | true
-            [name: "v", namespace: "v", author: "v", description: "v", /*iconUrl: "v", */ iconX2Url: "v", iconX3Url: "v"] | ["iconUrl", "not provided"]     | true
-            [name: "v", namespace: "v", author: "v", description: "v", iconUrl: "v", /*iconX2Url: "v",*/ iconX3Url: "v"]  | ["iconX2Url", "not provided"]   | true
-            [name: "v", namespace: "v", author: "v", description: "v", iconUrl: "v", iconX2Url: "v", /*iconX3Url: "v"*/]  | ["iconX3Url", "not provided"]   | true
+            [/*name: "v",*/ namespace: "v", author: "v", description: "v", iconUrl: "v", iconX2Url: "v", iconX3Url: "v"]  | ["name", "not set"]        | true
+            [name: "", namespace: "v", author: "v", description: "v", iconUrl: "v", iconX2Url: "v", iconX3Url: "v"]       | ["name", "empty"]          | false
+            [name: "v", /*namespace: "v", */ author: "v", description: "v", iconUrl: "v", iconX2Url: "v", iconX3Url: "v"] | ["namespace", "not set"]   | true
+            [name: "v", namespace: "v", /*author: "v", */ description: "v", iconUrl: "v", iconX2Url: "v", iconX3Url: "v"] | ["author", "not set"]      | true
+            [name: "v", namespace: "v", author: "v", /*description: "v",*/ iconUrl: "v", iconX2Url: "v", iconX3Url: "v"]  | ["description", "not set"] | true
+            [name: "v", namespace: "v", author: "v", description: "v", /*iconUrl: "v", */ iconX2Url: "v", iconX3Url: "v"] | ["iconUrl", "not set"]     | true
+            [name: "v", namespace: "v", author: "v", description: "v", iconUrl: "v", /*iconX2Url: "v",*/ iconX3Url: "v"]  | ["iconX2Url", "not set"]   | true
+            [name: "v", namespace: "v", author: "v", description: "v", iconUrl: "v", iconX2Url: "v", /*iconX3Url: "v"*/]  | ["iconX3Url", "not set"]   | true
     }
 
     def "Script with no definition() call will fail"()

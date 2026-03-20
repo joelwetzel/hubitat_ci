@@ -136,7 +136,7 @@ preferences{
         then:
             def ex = thrown(AssertionError)
             ex.message ==~ /(?i).*page.*/
-            expectedErrorStrings.each { ex.message.contains(it) }
+            expectedErrorStrings.each { assert ex.message.contains(it) }
 
         where:
             script                                                            | expectedErrorStrings
@@ -582,7 +582,7 @@ def makePage2() { foo() }"""]
 
         then:
             expectedValues.each {
-                href."${it.key}" == it.value
+                assert href."${it.key}" == it.value
             }
 
         where:
@@ -590,9 +590,9 @@ def makePage2() { foo() }"""]
             PreferencesValidationCommon.pageWith(
                     "href('SomePage')")                                                                                                            | [nextPageName: "SomePage", options: null]
             PreferencesValidationCommon.pageWith(
-                    "href(title: 'tit', required: false, description: 'desc', style:'page', url: 'http://a', page: 'somePage', image: 'someImg')") | [nextPageName: null, options: [title: 'tit', description: 'desc', style: 'page', url: 'http://a', page: 'somePage', image: 'someImg']]
+                    "href(title: 'tit', required: false, description: 'desc', style:'page', url: 'http://a', page: 'somePage', image: 'someImg')") | [nextPageName: null, options: [title: 'tit', required: false, description: 'desc', style: 'page', url: 'http://a', page: 'somePage', image: 'someImg']]
             PreferencesValidationCommon.pageWith(
-                    "href('somePage', required: false, description: 'desc', style:'page', url: 'http://a', title: 'tit', image: 'someImg')")       | [nextPageName: 'somePage', options: [description: 'desc', style: 'page', url: 'http://a', image: 'someImg']]
+                    "href('somePage', required: false, description: 'desc', style:'page', url: 'http://a', title: 'tit', image: 'someImg')")       | [nextPageName: 'somePage', options: [required: false, description: 'desc', style: 'page', url: 'http://a', title: 'tit', image: 'someImg']]
     }
 
     def "href() 'page' option is not compatible with external style"() {
@@ -813,5 +813,25 @@ preferences {
             AssertionError e = thrown()
             e.message.contains("page() is being called within section()")
             !e.message.contains("recursive")
+    }
+
+    def "Dynamic page's method that takes a Map argument will be called right away"() {
+        given:
+            def sandbox = new HubitatAppSandbox("""
+preferences{
+    page(name:"imSoDynamic")
+}
+
+void imSoDynamic(Map params)
+{
+    dynamicPage(name:"imSoDynamic", title:"dynamicTitle", install: true){ ${PreferencesValidationCommon.validSection} }
+}
+""")
+            def preferences = sandbox.readPreferences()
+
+        expect:
+            preferences.dynamicPages[0].options['name'] == "imSoDynamic"
+            preferences.dynamicPages[0].options['title'] == "dynamicTitle"
+            preferences.dynamicPages[0].sections[0].children[0].options.title == "Temperature"
     }
 }

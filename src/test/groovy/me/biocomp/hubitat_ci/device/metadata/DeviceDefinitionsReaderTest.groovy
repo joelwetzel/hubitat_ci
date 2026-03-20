@@ -260,14 +260,14 @@ def on()
 
         then:
             AssertionError e = thrown()
-            expectedErrorParts.each { e.message.contains(it) }
+            expectedErrorParts.each { assert e.message.contains(it) }
 
         where:
             commands                                        | expectedErrorParts
             """command('cmd')
-               command('cmd')"""             | ['cmd', 'duplicate']
+               command('cmd')"""             | ['cmd', 'matching signature']
             """command('cmd', ['number'])
-               command('cmd', ['number'])""" | ['cmd', 'duplicate', 'number']
+               command('cmd', ['number'])""" | ['cmd', 'number', 'matching signature']
     }
 
     @Unroll
@@ -355,15 +355,15 @@ def cmd3(int a, int b) {}
             AssertionError e = thrown()
             e.message.contains('match')
             e.message.contains('signature')
-            expectedErrorParts.each { e.message.contains(it) }
+            expectedErrorParts.each { assert e.message.contains(it) }
 
         where:
             command                                 | expectedErrorParts
-            "command('cmd1')"                       | ['cmd1', 'cmd1(String']
-            "command('cmd2')"                       | ['cmd2', 'cmd2(int']
-            "command('cmd2', ['string'])"           | ['cmd2', 'cmd2(int']
-            "command('cmd1', ['number'])"           | ['cmd2', 'cmd2(string']
-            "command('cmd3', ['number', 'string'])" | ['cmd3', 'cmd3(int, int']
+            "command('cmd1')"                       | ['cmd1', 'matching signature']
+            "command('cmd2')"                       | ['cmd2', 'matching signature']
+            "command('cmd2', ['string'])"           | ['cmd2', 'matching signature']
+            "command('cmd1', ['number'])"           | ['cmd1', 'matching signature']
+            "command('cmd3', ['number', 'string'])" | ['cmd3', 'matching signature']
     }
 
     @Unroll

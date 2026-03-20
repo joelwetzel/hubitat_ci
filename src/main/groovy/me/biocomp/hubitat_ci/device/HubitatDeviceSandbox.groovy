@@ -71,7 +71,7 @@ class HubitatDeviceSandbox {
     private static DeviceValidator readValidator(Map options) {
         if (options.validationFlags)
         {
-            return new DeviceValidator(options.validationFlags as List<String>)
+            return new DeviceValidator(options.validationFlags as List<Flags>)
         }
 
         return new DeviceValidator()
