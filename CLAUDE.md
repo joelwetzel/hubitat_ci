@@ -96,13 +96,59 @@ src/main/groovy/me/biocomp/hubitat_ci/
     └── SandboxClassLoader.groovy
 
 src/test/groovy/me/biocomp/hubitat_ci/
+
+Scripts/                    # Example Hubitat apps/drivers for testing the framework
+SubmodulesWithScripts/      # Git submodules with real-world Hubitat projects
+hubitat_api.json            # Auto-exported Hubitat API signatures (populated by exporter scripts)
+hubitat_api_overrides.json  # Manual API corrections/extensions for validation
 ```
 
 ## Testing
 
 Tests use the [Spock framework](http://spockframework.org/) (BDD-style `given/when/then` or `expect` blocks). Test classes extend `spock.lang.Specification`.
 
-The `src/test/` directory contains tests for the library itself. Git submodules in the repo root (`EcoNet/`, `konnected/`, etc.) are real-world Hubitat script repos used by `ExistingDeviceScriptsTest`.
+The `src/test/` directory contains tests for the library itself. Git submodules in `SubmodulesWithScripts/` (`EcoNet/`, `konnected/`, etc.) are real-world Hubitat script repos used by `ExistingDeviceScriptsTest`.
+
+### Testing Conventions
+
+**Script-as-Text pattern** — prefer inline script strings over file paths in tests to decouple from internal classes and make tests resilient to refactoring:
+```groovy
+def scriptText = '''
+definition(name: "Test App") { ... }
+preferences { ... }
+'''
+def sandbox = new HubitatAppSandbox(scriptText)
+```
+
+**Two testing modes:**
+1. **Unit testing** — use sandboxes directly with `Mock{}` for fine-grained control
+2. **Integration testing** — extend `IntegrationAppSpecification` / `IntegrationDeviceSpecification`; don't create sandboxes manually
+
+**Common `Flags` values** passed via `validationFlags:`:
+- `Flags.DontRunScript` — compile only, don't execute
+- `Flags.DontValidateDefinition` — skip definition block validation
+
+**Integration test boilerplate:**
+```groovy
+class MyAppTest extends IntegrationAppSpecification {
+    def switchFixture = SwitchFixtureFactory.create('s1')
+
+    def setup() {
+        TimeKeeper.set(Date.parse("yyyy-MM-dd HH:mm:ss", "2024-01-01 10:00:00"))
+        super.initializeEnvironment(
+            appScriptFilename: "Scripts/MyApp.groovy",
+            userSettingValues: [switches: [switchFixture]]
+        )
+        switchFixture.initialize(appExecutor, [switch: "off"])
+    }
+}
+```
+
+### Common Pitfalls
+
+- **Reset TimeKeeper between tests** — call `TimeKeeper.removeAllListeners()` in `setup()` or `cleanup()`; it's a stateful singleton and will bleed state across tests otherwise
+- **Initialize device fixtures** with both an executor and initial state before use (see `switchFixture.initialize()` above)
+- **VS Code Testing tab won't show tests** — Spock requires a JUnit-compatible runner; use the terminal or IntelliJ IDEA
 
 ## Publishing
 

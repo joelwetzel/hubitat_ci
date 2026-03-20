@@ -60,7 +60,7 @@ Test reports: `build/reports/tests/test/index.html`
 ./gradlew publish
 ```
 
-GitHub Actions automatically builds and publishes on every master commit ([.github/workflows/ci.yml](../.github/workflows/ci.yml)).
+GitHub Actions builds on every master commit and publishes to GitHub Packages only when the version in `build.gradle` is new — it checks for existing versions to avoid duplicate publishes ([.github/workflows/ci.yml](../.github/workflows/ci.yml)).
 
 ## Project-Specific Conventions
 
@@ -119,7 +119,7 @@ class MyAppTest extends IntegrationAppSpecification {
 
 ### API Override Files
 
-- `hubitat_api.json`: Auto-exported Hubitat API signatures (empty in repo, populated by exporter scripts)
+- `hubitat_api.json`: Auto-exported Hubitat API signatures (populated by exporter scripts; checked into repo)
 - `hubitat_api_overrides.json`: Manual API corrections/extensions for validation
 
 ## File Organization
