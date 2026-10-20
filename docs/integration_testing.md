@@ -2,7 +2,33 @@
 
 ## Overview
 
-The integration testing framework allows you to write end-to-end tests for your Hubitat apps and device drivers. Unlike unit tests that focus on individual methods with mocks, integration tests verify that your entire app or driver behaves correctly when interacting with devices, schedules, and events.
+Integration tests verify **end-to-end behavior** of your Hubitat apps and device drivers. Unlike validation tests (which check structure) or unit tests (which test individual methods with mocks), integration tests simulate how your code behaves in a real Hubitat environment.
+
+**Integration tests vs Validation tests:**
+
+| Validation Tests | Integration Tests |
+|-----------------|-------------------|
+| Automatic - no test code needed | You write test scenarios |
+| Check structure and metadata | Test actual behavior |
+| Run on every sandbox.run() | Use IntegrationAppSpecification |
+| Fast validation | Realistic simulation |
+| Catch structural errors | Catch logic errors |
+
+See [How to Test](how_to_test.md) for details on validation and unit testing.
+
+## When to Use Integration Tests
+
+Use integration tests to verify:
+- Time-based logic (schedules, delays, recurring events)
+- Multi-device coordination
+- Event handling and subscriptions
+- State management across events
+- Real-world scenarios ("when motion detected at night, turn on lights")
+
+Use validation tests for:
+- Ensuring definition/preferences are correct
+- Checking API usage
+- Structural validation
 
 ## Key Concepts
 
@@ -371,13 +397,188 @@ def "App handles device failure gracefully"() {
 
 ## Real-World Examples
 
-For complete examples of integration tests in action, see:
+These repositories show integration tests in production use. Each demonstrates different testing patterns and best practices.
 
-- [Hubitat-Switch-Bindings](https://github.com/joelwetzel/Hubitat-Switch-Bindings) - Examples of app integration tests
-- [Hubitat-Lockdown](https://github.com/joelwetzel/Hubitat-Lockdown) - Complex multi-device scenarios
-- [Hubitat-Auto-Shades](https://github.com/joelwetzel/Hubitat-Auto-Shades) - Annotated integration tests showing best practices
+### Hubitat-Switch-Bindings
+**Repository:** [github.com/joelwetzel/Hubitat-Switch-Bindings](https://github.com/joelwetzel/Hubitat-Switch-Bindings)
 
-## Troubleshooting
+**What it does:** Binds switches and dimmers together in 3-way, 4-way configurations
+
+**Testing highlights:**
+- Basic integration test setup with `IntegrationAppSpecification`
+- Multiple switch fixtures interacting
+- Testing master/slave relationships
+- Dimmer level synchronization
+
+**Example test structure:**
+```groovy
+class SwitchBindingsIntegrationTest extends IntegrationAppSpecification {
+    def masterSwitch
+    def slaveSwitches = []
+    
+    def setup() {
+        masterSwitch = SwitchFixtureFactory.create('Master')
+        slaveSwitches = [
+            SwitchFixtureFactory.create('Slave 1'),
+            SwitchFixtureFactory.create('Slave 2')
+        ]
+        
+        super.initializeEnvironment(
+            appScriptFilename: "Switch Bindings.groovy",
+            userSettingValues: [
+                master: masterSwitch,
+                slaves: slaveSwitches
+            ]
+        )
+        
+        // Initialize fixtures
+        masterSwitch.initialize(appExecutor, [switch: "off"])
+        slaveSwitches.each { it.initialize(appExecutor, [switch: "off"]) }
+        
+        appScript.initialize()
+    }
+    
+    def "When master switch turns on, all slaves turn on"() {
+        when:
+            masterSwitch.on()
+        
+        then:
+            slaveSwitches.every { it.currentValue("switch") == "on" }
+    }
+}
+```
+
+**What you'll learn:**
+- Setting up multiple device fixtures
+- Testing device synchronization
+- Basic integration test patterns
+
+### Hubitat-Lockdown
+**Repository:** [github.com/joelwetzel/Hubitat-Lockdown](https://github.com/joelwetzel/Hubitat-Lockdown)
+
+**What it does:** Coordinates locks, switches, and modes for security scenarios
+
+**Testing highlights:**
+- Multiple device types (locks, switches, presence sensors)
+- Mode changes and mode-dependent behavior
+- Complex state machines
+- Time-based mode switching
+
+**Key patterns demonstrated:**
+```groovy
+def "Lockdown mode locks all doors and turns off switches"() {
+    given:
+        def lock = LockFixtureFactory.create('Front Door')
+        def switches = [
+            SwitchFixtureFactory.create('Living Room'),
+            SwitchFixtureFactory.create('Kitchen')
+        ]
+        
+        // Setup test environment
+        super.initializeEnvironment(
+            appScriptFilename: "Lockdown.groovy",
+            userSettingValues: [
+                locks: [lock],
+                switches: switches
+            ]
+        )
+        
+        lock.initialize(appExecutor, [lock: "unlocked"])
+        switches.each { it.initialize(appExecutor, [switch: "on"]) }
+        appScript.initialize()
+    
+    when: "Lockdown mode is activated"
+        appScript.activateLockdown()
+    
+    then: "All locks are locked"
+        lock.currentValue("lock") == "locked"
+    
+    and: "All switches are off"
+        switches.every { it.currentValue("switch") == "off" }
+}
+```
+
+**What you'll learn:**
+- Multi-device coordination
+- Testing mode-based logic
+- Complex state transitions
+- Security-critical behavior testing
+
+### Hubitat-Auto-Shades
+**Repository:** [github.com/joelwetzel/Hubitat-Auto-Shades](https://github.com/joelwetzel/Hubitat-Auto-Shades)
+
+**What it does:** Automatically controls window shades based on time, sun position, and temperature
+
+**Testing highlights:**
+- Well-commented test code showing best practices
+- Time-of-day logic testing with `TimeKeeper`
+- Window shade position fixtures
+- Scheduled event testing
+- Sunrise/sunset calculations
+
+**Example showing time control:**
+```groovy
+def "Shades open at sunrise"() {
+    given: "It's just before sunrise"
+        TimeKeeper.set(Date.parse("yyyy-MM-dd HH:mm:ss", "2024-06-15 05:55:00"))
+        
+        def shade = WindowShadeFixtureFactory.create('Bedroom Shade')
+        shade.initialize(appExecutor, [windowShade: "closed", position: 0])
+        
+        super.initializeEnvironment(
+            appScriptFilename: "Auto Shades.groovy",
+            userSettingValues: [
+                shades: [shade],
+                openAtSunrise: true
+            ]
+        )
+        
+        appScript.initialize()
+    
+    when: "Time advances to sunrise"
+        TimeKeeper.advanceMinutes(10)  // Now 6:05 AM, after sunrise
+    
+    then: "Shade opens automatically"
+        shade.currentValue("windowShade") == "open"
+        shade.currentValue("position") == 100
+}
+```
+
+**What you'll learn:**
+- Comprehensive test documentation
+- Time-based event testing
+- Scheduled callback verification
+- Best practices for readable tests
+
+### Hubitat CI Example Repository
+**Repository:** [github.com/biocomp/hubitat_ci_example](https://github.com/biocomp/hubitat_ci_example)
+
+**What it does:** Minimal examples and test patterns for learning
+
+**Contains:**
+- `minimal/` - Simplest possible app and test
+- `how_to_test/` - Mocking techniques and validation patterns
+- Examples of both validation and integration tests
+
+**What you'll learn:**
+- Minimal project setup
+- Different testing approaches
+- Mocking patterns
+- Preference and input validation
+
+## Setting Up Integration Tests in Your Repository
+
+For a complete guide on setting up testing in your own repository, including environment variables and GitHub Actions, see [Using Hubitat CI in Your Repo](using_in_your_repo.md).
+
+Quick checklist:
+- [ ] Add `hubitat_ci` dependency to `build.gradle`
+- [ ] Set up GitHub token for package access
+- [ ] Create test class extending `IntegrationAppSpecification`
+- [ ] Initialize device fixtures in `setup()`
+- [ ] Write tests using `TimeKeeper` for time control
+- [ ] Set up GitHub Actions for CI (see [Using in Your Repo](using_in_your_repo.md))
+
+## Comparison: Unit Tests vs Integration Tests
 
 ### Scheduled events not firing
 
